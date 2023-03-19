@@ -8,9 +8,9 @@ end
 
 % sodium 
 
-function I = I_na(V, m ,h)
+function I = I_na(V, m ,h, g)
     p = 3; A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
+    %g maximal conductance, need to search up
     Ei = 50; % reversal potential
     I = g * m^p * h * (V - Ei) * A;
 end
@@ -27,14 +27,21 @@ function dhdt = dh_I_na(V, h)
     dmdt = (h_inf - h)/tau_h;
 end
 
+% change in calcium concentration
+function dCadt = dCa(Ca_conc, I_CaT, I_CaS)
+    tau = 200; % all times for the code is in ms
+    f = 14.96;
+    Ca_0 = .05 * 1E-3; % now in units of mM
+    dCadt = -f * (I_CaT + I_CaS) - Ca_conc + Ca_0;
+
 % calcium transient
 
-function I = I_CaT(V, m ,h, Ca_conc)
+function I = I_CaT(V, m ,h, Ca_conc, g)
     p = 3; A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
+    % g = 000000000; % maximal conductance, need to search up
     % reversal potential must be calculated from nernst potential
     %E = RT/(zF) * log( [out]/[in] )
-    E = 27/2 * log(3/ Ca_conc);
+    E = 27/2 * log(3/ Ca_conc); % 3 is in units of mM
     I = g * m^p * h * (V - E) * A;
 end
 
@@ -50,9 +57,10 @@ function dhdt = dh_I_CaT(V, h)
     dmdt = (h_inf - h)/tau_h;
 end
 
-function I = I_CaS(V, m, h, Ca_conc)
+% slow calcium
+
+function I = I_CaS(V, m, h, Ca_conc, g)
     p = 3; A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
     % reversal potential must be calculated from nernst potential
     %E = RT/(zF) * log( [out]/[in] )
     E = 27/2 * log(3/ Ca_conc);
@@ -73,9 +81,8 @@ end
 
 % transient K+ current
 
-function I = I_A(V, m, h)
+function I = I_A(V, m, h, g)
     p = 3; A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
     E = -80;
     I = g * m^p * h * (V - E) * A;
 end
@@ -94,9 +101,8 @@ end
 
 % calcium dependent potassium current
 
-function I = I_KCa(V, m, h)
+function I = I_KCa(V, m, h, g)
     p = 4; A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
     E = -80;
     I = g * m^p * h * (V - E) * A;
 end
@@ -109,9 +115,8 @@ end
 
 % delayed rectifier K+ current I_Kd
 
-function I = I_Kd(V, m, h)
+function I = I_Kd(V, m, h, g)
     p = 4; A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
     E = -80;
     I = g * m^p * h * (V - E) * A;
 end
@@ -124,9 +129,8 @@ end
 
 % hyperpolarization-activated inward current I_H
 
-function I = I_H(V, m, h)
+function I = I_H(V, m, h, g)
     p = 1; A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
     E = -20;
     I = g * m^p * h * (V - E) * A;
 end
@@ -139,10 +143,48 @@ end
 
 % leak current I_leak
 
-function I = I_leak(V, m, h)
+function I = I_leak(V, m, h, g)
     p = 0; % TODO: what is p for I_leak?...
     A = .628E-3;
-    g = 000000000; % maximal conductance, need to search up
+    %g = 000000000; % maximal conductance, need to search up
     E = -50;
     I = g * m^p * h * (V - E) * A; % does I_leak even have this functional form?
 end
+
+% synaptic current
+
+function dsdt = ds_glutameric(s, V_pre)
+    Es = -70;
+    k_ = 1/40;
+    Vth = -35;
+    delta = 5;
+    sbar = sig((Vth - V_pre)/delta);
+    tau_s = (1 - sbar) / k_;
+    dsdt = (sbar - s)/tau_s;
+end
+
+function dsdt = ds_cholinergic(s, V_pre)
+    Es = -80;
+    k_ = 1/100;
+    Vth = -35;
+    delta = 5;
+    sbar = sig((Vth - V_pre)/delta);
+    tau_s = (1 - sbar) / k_;
+    dsdt = (sbar - s)/tau_s;
+end
+
+function I = I_s_glutameric(V_post, g_s, s)
+    Es = -70;
+    I = g_s * s * (V_post - Es);
+end
+
+function I = I_s_cholinergic(V_post, g_s, s)
+    Es = -80;
+    I = g_s * s * (V_post - Es);
+end
+
+
+
+
+
+
