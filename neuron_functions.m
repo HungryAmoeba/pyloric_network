@@ -6,14 +6,17 @@ function sig = sig(x)
     sig = 1/ (1 + exp(x));
 end
 
+% always assume that V is in mV
+
 % sodium 
 
 function I = I_na(V, m ,h, g)
-    p = 3; A = .628E-3;
+    p = 3; A = .628E-3; % A has units of cm^2
     %g maximal conductance, need to search up
-    Ei = 50; % reversal potential
+    Ei = 50; % reversal potential, mV
     I = g * m^p * h * (V - Ei) * A;
 end
+% I has units of microamperes
 
 function dmdt = dm_I_na(V, m)
     tau_m = 2.64 - 2.52 * sig((V + 120)/-25);
