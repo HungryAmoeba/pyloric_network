@@ -19,16 +19,16 @@ ABPD.m_CaS = .5; ABPD.h_CaS = .5; ABPD.g_CaS = 6;
 ABPD.m_A = .5; ABPD.h_A = .5; ABPD.g_A = 50;
 
 %calcium dependent
-ABPD.m_KCa = .5; ABPD.h_KCa = .5; ABPD.g_KCa = 10;
+ABPD.m_KCa = .5; ABPD.h_KCa = 1; ABPD.g_KCa = 10;
 
 %delayed rectifier
-ABPD.m_Kd = .5; ABPD.h_Kd = .5; ABPD.g_Kd = 100;
+ABPD.m_Kd = .5; ABPD.h_Kd = 1; ABPD.g_Kd = 100;
 
 % Hyperpolarization activated 
-ABPD.m_H = .5; ABPD.h_H = .5; ABPD.g_H = .01;
+ABPD.m_H = .5; ABPD.h_H = 1; ABPD.g_H = .01;
 
 % Leak  
-ABPD.m_leak = .5; ABPD.h_leak = .5; ABPD.g_leak = 0;
+ABPD.m_leak = 1; ABPD.h_leak = 1; ABPD.g_leak = 0;
 
 % create LP neuron
 
@@ -50,16 +50,16 @@ LP.m_CaS = .5; LP.h_CaS = .5; LP.g_CaS = 8;
 LP.m_A = .5; LP.h_A = .5; LP.g_A = 40;
 
 %calcium dependent
-LP.m_KCa = .5; LP.h_KCa = .5; LP.g_KCa = 5;
+LP.m_KCa = .5; LP.h_KCa = 1; LP.g_KCa = 5;
 
 %delayed rectifier
-LP.m_Kd = .5; LP.h_Kd = .5; LP.g_Kd = 75;
+LP.m_Kd = .5; LP.h_Kd = 1; LP.g_Kd = 75;
 
 % Hyperpolarization activated 
-LP.m_H = .5; LP.h_H = .5; LP.g_H = .05;
+LP.m_H = .5; LP.h_H = 1; LP.g_H = .05;
 
 % Leak  
-LP.m_leak = .5; LP.h_leak = .5; LP.g_leak = 0.2;
+LP.m_leak = 1; LP.h_leak = 1; LP.g_leak = 0.2;
 
 % create PY neuron
 
@@ -81,20 +81,22 @@ PY.m_CaS = .5; PY.h_CaS = .5; PY.g_CaS = 2;
 PY.m_A = .5; PY.h_A = .5; PY.g_A = 50;
 
 %calcium dependent
-PY.m_KCa = .5; PY.h_KCa = .5; PY.g_KCa = 0;
+PY.m_KCa = .5; PY.h_KCa = 1; PY.g_KCa = 0;
 
 %delayed rectifier
-PY.m_Kd = .5; PY.h_Kd = .5; PY.g_Kd = 125;
+PY.m_Kd = .5; PY.h_Kd = 1; PY.g_Kd = 125;
 
 % Hyperpolarization activated 
-PY.m_H = .5; PY.h_H = .5; PY.g_H = .05;
+PY.m_H = .5; PY.h_H = 1; PY.g_H = .05;
 
 % Leak  
-PY.m_leak = .5; PY.h_leak = .5; PY.g_leak = 0;
+PY.m_leak = 1; PY.h_leak = 1; PY.g_leak = 0;
 
 % Synapses
 % Synapses have one of five or six different strenghts:
 % 0, 3, 10, 30, 100 nS, or for synapses onto PY, 1 nS
+%PRESYNAPTIC.POSTSYNAPTIC_{glu/cho}_{g/s}
+
 % ABPD
 ABPD.LP_glu_g = 30 * 1E-6; % put into units of mS
 ABPD.PY_glu_g = 1 * 1E-6;
@@ -118,7 +120,7 @@ LP.PY_glu_s = 1 * 1E-6;
 PY.LP_glu_s = 10 * 1E-6;
 
 dt = 0.01;
-t = 0:dt:60;
+t = 0:dt:300; % what if t is in ms?
 
 tspan = [0, max(t)];
 
@@ -160,7 +162,23 @@ y0 = [ABPD.V; ...
     LP.PY_glu_s; ...
     PY.LP_glu_s
 ];
+vars.ABPD = ABPD;
+vars.LP = LP;
+vars.PY = PY;
+opts = odeset('MaxStep',.1);
 
-[TOUT, YOUT] = ode45(@neural_circuit_func, tspan, y0);
+[TOUT, YOUT] = ode45(@neural_circuit_func, tspan, y0, opts, vars);
 
+subplot(3,1,1);
+plot(TOUT, YOUT(:,1))
+title("ABPD voltage");
 
+subplot(3,1,2);
+plot(TOUT, YOUT(:,19))
+title("LP voltage");
+
+subplot(3,1,3);
+plot(TOUT, YOUT(:,37))
+title("PY voltage");
+xlabel("Time (s)");
+ylabel("mV");
