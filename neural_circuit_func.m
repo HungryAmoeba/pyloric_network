@@ -336,7 +336,7 @@ end
 % synaptic current
 
 function dsdt = ds_glutameric(s, V_pre)
-    k_ = 1/40 * 1E-3; % s
+    k_ = 1/40; % 1/40 is for ms
     Vth = -35;
     delta = 5;
     sbar = sig((Vth - V_pre)/delta);
@@ -345,7 +345,7 @@ function dsdt = ds_glutameric(s, V_pre)
 end
 
 function dsdt = ds_cholinergic(s, V_pre)
-    k_ = 1/100 * 1E-3; % s
+    k_ = 1/100; % ms
     Vth = -35;
     delta = 5;
     sbar = sig((Vth - V_pre)/delta);
@@ -368,5 +368,5 @@ function dvdt = dV(currents_sum, synapse_current)
     C = .628; % membrane capacitance, nF
     I = -currents_sum - synapse_current; % uA
     dvdt_raw_units = I/C; % uA / nF = kV / s
-    dvdt = dvdt_raw_units * 1E-6; % mV / s 
+    dvdt = dvdt_raw_units * 1E6;%* 1E-3; % mV / ms 
 end

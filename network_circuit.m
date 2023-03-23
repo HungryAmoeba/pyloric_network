@@ -1,28 +1,29 @@
-% create one neuron
+% example h
 
+% AB/PD has cell #5
 ABPD.V = -60; %initial membrane voltage
 % start with parameters for AB/PD 1
 
 % sodium
-ABPD.m_Na = .5; ABPD.h_Na = .5; ABPD.g_Na = 400;
+ABPD.m_Na = .5; ABPD.h_Na = .5; ABPD.g_Na = 300;
 %g_Na and others have units of mS/cm^2
 
 % calcium
 ABPD.Ca_conc = 100 * 1E-6; %100 nM, put into mM. Arb. starting value
 
 ABPD.m_CaT = .5; ABPD.h_CaT = .5; ABPD.g_CaT = 2.5;
-ABPD.m_CaS = .5; ABPD.h_CaS = .5; ABPD.g_CaS = 6;
+ABPD.m_CaS = .5; ABPD.h_CaS = .5; ABPD.g_CaS = 2;
 
 % Potassium
 
 %transient
-ABPD.m_A = .5; ABPD.h_A = .5; ABPD.g_A = 50;
+ABPD.m_A = .5; ABPD.h_A = .5; ABPD.g_A = 10;
 
 %calcium dependent
-ABPD.m_KCa = .5; ABPD.h_KCa = 1; ABPD.g_KCa = 10;
+ABPD.m_KCa = .5; ABPD.h_KCa = 1; ABPD.g_KCa = 5;
 
 %delayed rectifier
-ABPD.m_Kd = .5; ABPD.h_Kd = 1; ABPD.g_Kd = 100;
+ABPD.m_Kd = .5; ABPD.h_Kd = 1; ABPD.g_Kd = 125;
 
 % Hyperpolarization activated 
 ABPD.m_H = .5; ABPD.h_H = 1; ABPD.g_H = .01;
@@ -42,24 +43,24 @@ LP.m_Na = .5; LP.h_Na = .5; LP.g_Na = 100;
 LP.Ca_conc = 100 * 1E-6; %100 nM, put into mM. Arb. starting value
 
 LP.m_CaT = .5; LP.h_CaT = .5; LP.g_CaT = 0;
-LP.m_CaS = .5; LP.h_CaS = .5; LP.g_CaS = 8;
+LP.m_CaS = .5; LP.h_CaS = .5; LP.g_CaS = 10;
 
 % Potassium
 
 %transient
-LP.m_A = .5; LP.h_A = .5; LP.g_A = 40;
+LP.m_A = .5; LP.h_A = .5; LP.g_A = 50;
 
 %calcium dependent
 LP.m_KCa = .5; LP.h_KCa = 1; LP.g_KCa = 5;
 
 %delayed rectifier
-LP.m_Kd = .5; LP.h_Kd = 1; LP.g_Kd = 75;
+LP.m_Kd = .5; LP.h_Kd = 1; LP.g_Kd = 100;
 
 % Hyperpolarization activated 
-LP.m_H = .5; LP.h_H = 1; LP.g_H = .05;
+LP.m_H = .5; LP.h_H = 1; LP.g_H = 0;
 
 % Leak  
-LP.m_leak = 1; LP.h_leak = 1; LP.g_leak = 0.2;
+LP.m_leak = 1; LP.h_leak = 1; LP.g_leak = 0.03;
 
 % create PY neuron
 
@@ -90,7 +91,7 @@ PY.m_Kd = .5; PY.h_Kd = 1; PY.g_Kd = 125;
 PY.m_H = .5; PY.h_H = 1; PY.g_H = .05;
 
 % Leak  
-PY.m_leak = 1; PY.h_leak = 1; PY.g_leak = 0;
+PY.m_leak = 1; PY.h_leak = 1; PY.g_leak = 0.01;
 
 % Synapses
 % Synapses have one of five or six different strenghts:
@@ -98,29 +99,30 @@ PY.m_leak = 1; PY.h_leak = 1; PY.g_leak = 0;
 %PRESYNAPTIC.POSTSYNAPTIC_{glu/cho}_{g/s}
 
 % ABPD
-ABPD.LP_glu_g = 30 * 1E-6; % put into units of mS
-ABPD.PY_glu_g = 1 * 1E-6;
-ABPD.LP_cho_g = 30 * 1E-6;
+ABPD.LP_glu_g = 3 * 1E-6; % put into units of mS
+ABPD.PY_glu_g = 10 * 1E-6;
+ABPD.LP_cho_g = 100 * 1E-6;
 ABPD.PY_cho_g = 1 * 1E-6;
 
 LP.ABPD_glu_g = 10 * 1E-6;
-LP.PY_glu_g = 1 * 1E-6;
+LP.PY_glu_g = 3 * 1E-6;
 
 PY.LP_glu_g = 10 * 1E-6;
 
 % synapse action variables
-ABPD.LP_glu_s = 30 * 1E-6; % i have no idea what values are reasonable
-ABPD.PY_glu_s = 1 * 1E-6;
-ABPD.LP_cho_s = 30 * 1E-6;
-ABPD.PY_cho_s = 1 * 1E-6;
+ABPD.LP_glu_s = .75; % assigned to values at the end of a run
+ABPD.PY_glu_s = .75;
+ABPD.LP_cho_s = .89;
+ABPD.PY_cho_s = .89;
 
-LP.ABPD_glu_s = 10 * 1E-6;
-LP.PY_glu_s = 1 * 1E-6;
+LP.ABPD_glu_s = .72;
+LP.PY_glu_s = .72;
 
-PY.LP_glu_s = 10 * 1E-6;
+PY.LP_glu_s = .69;
 
-dt = 0.01;
-t = 0:dt:300; % what if t is in ms?
+% this is really only useful for interpolation afterwards
+dt = 0.1;
+t = 0:dt:2000; % what if t is in ms?
 
 tspan = [0, max(t)];
 
@@ -165,9 +167,12 @@ y0 = [ABPD.V; ...
 vars.ABPD = ABPD;
 vars.LP = LP;
 vars.PY = PY;
-opts = odeset('MaxStep',.1);
 
-[TOUT, YOUT] = ode45(@neural_circuit_func, tspan, y0, opts, vars);
+% this likely doesn't do anything
+opts = odeset('MaxStep',10); % increase maxstep to 1 when using ms
+
+% changed from ode45
+[TOUT, YOUT] = ode23(@neural_circuit_func, tspan, y0, opts, vars);
 
 subplot(3,1,1);
 plot(TOUT, YOUT(:,1))
@@ -182,3 +187,5 @@ plot(TOUT, YOUT(:,37))
 title("PY voltage");
 xlabel("Time (s)");
 ylabel("mV");
+
+savefig('model_h.fig')
